@@ -1,0 +1,23 @@
+extends ../layout/main-layout.pug
+block styles
+    link(rel="stylesheet" href="/css/product.css")
+    link(rel="stylesheet" href="/css/forms.css")
+block content
+    main
+        form.product-form(method="POST",action= editing ? "/admin/edit_product" :"/admin/add_product")
+            .form-control
+                label(for="title") title
+                input(type="text" id="title" name="title" value= editing ? product.title :"")
+            .form-control
+                label(for="imageUrl") image
+                input(type="text" id="imageUrl" name="imageUrl" value= editing ? product.imageUrl :"")
+            .form-control
+                label(for="price") price
+                input(type="number" id="price" name="price" step="any" value= editing ? product.price :"")
+            .form-control
+                label(for="description") description
+                textarea(id="description" name="description" rows="10") #{editing ? product.description :""}
+            if editing
+                input(type="hidden" value=product._id name="id")    
+                //- input(type="hidden" value=product.id name="id")    
+            button.btn(type="submit") #{editing ? 'Update Product' : 'Add product'}     

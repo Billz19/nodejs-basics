@@ -1,0 +1,18 @@
+extends ../layout/main-layout.pug
+block content
+    main
+        if orders.length 
+            ul
+                each order in orders
+                    li
+                        //- h1 # #{order.id}
+                        h1 # #{order._id}
+                        ul
+                            //- each prod in order.products
+                            //- each prod in order.items
+                            each prod in order.products
+                                //- li #{prod.title} (#{prod.OrderItem.quantity})
+                                //- li #{prod.title} (#{prod.quantity})
+                                li #{prod.product.title} (#{prod.quantity})
+        else
+            h1 No orders yet
