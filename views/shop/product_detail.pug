@@ -10,7 +10,8 @@ block content
         h2 $ #{product.price}
         p #{product.description}
         //- +addToCartForm(product.id)
-        +addToCartForm(product._id)
+        if isAuthenticated    
+            +addToCartForm(product._id)
         //- form(action="/cart" method="POST")
         //-     button.btn(type="submit") Add to Cart    
         //-     input(type="hidden" name="prodId", value=product.id)    

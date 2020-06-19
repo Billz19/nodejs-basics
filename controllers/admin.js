@@ -4,6 +4,7 @@ exports.getAddProduct = (req, resp, next) => {
     docTitle: 'Add Product',
     path: '/add_product',
     editing: false,
+    isAuthenticated: req.session.loggedIn,
   });
 };
 
@@ -13,6 +14,7 @@ exports.getProducts = (req, resp) => {
       prods: products,
       docTitle: 'Admin Products',
       path: '/admin_prods',
+      isAuthenticated: req.session.loggedIn,
     });
   });
   // Product.fetchAll().then((products) => {
@@ -80,6 +82,7 @@ exports.getEditProduct = (req, resp) => {
       path: '/edit_product',
       editing: true,
       product: product,
+      isAuthenticated: req.session.loggedIn,
     });
     // const prodId = req.params.productId;
     // Product.findByPk(prodId).then((product) => {

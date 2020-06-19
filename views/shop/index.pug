@@ -15,8 +15,9 @@ block content
                         h2.product__price $#{product.price}
                         p.product__description #{product.description}    
                     .card__actions
-                        a.btn(href="/products/"+product._id) Details    
-                        +addToCartForm(product._id)    
+                        a.btn(href="/products/"+product._id) Details
+                        if isAuthenticated    
+                            +addToCartForm(product._id)    
                         //- a.btn(href="/products/"+product.id) Details    
                         //- +addToCartForm(product.id)    
     else

@@ -1,18 +1,20 @@
 extends ../layout/main-layout.pug
+block styles
+    link(rel="stylesheet", href="/css/order.css")
 block content
     main
         if orders.length 
-            ul
+            ul.orders
                 each order in orders
-                    li
+                    li.orders__item
                         //- h1 # #{order.id}
                         h1 # #{order._id}
-                        ul
+                        ul.orders__products
                             //- each prod in order.products
                             //- each prod in order.items
                             each prod in order.products
                                 //- li #{prod.title} (#{prod.OrderItem.quantity})
                                 //- li #{prod.title} (#{prod.quantity})
-                                li #{prod.product.title} (#{prod.quantity})
+                                li.orders__products-item #{prod.product.title} (#{prod.quantity})
         else
             h1 No orders yet
