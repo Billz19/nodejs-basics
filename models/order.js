@@ -6,7 +6,8 @@ const orderSchema = new Schema({
     quantity: Number
   }],
   user:{
-    name: String,
+    // name: String,
+    email: String,
     userId:{
       type: Schema.Types.ObjectId,
       ref: 'User'

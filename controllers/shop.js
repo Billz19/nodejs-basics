@@ -64,6 +64,7 @@ exports.getIndex = (req, resp, next) => {
       docTitle: 'Shop',
       path: '/shop',
       isAuthenticated: req.session.loggedIn,
+      csrfToken: req.csrfToken()
     });
   });
   // Product.fetchAll().then((products) => {
@@ -244,6 +245,7 @@ exports.postOrder = (req, resp) => {
         products,
         user: {
           name: user.name,
+          email: user.email,
           userId: user,
         },
       };

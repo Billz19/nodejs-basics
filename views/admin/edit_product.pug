@@ -20,4 +20,5 @@ block content
             if editing
                 input(type="hidden" value=product._id name="id")    
                 //- input(type="hidden" value=product.id name="id")    
+            input(type="hidden", name="_csrf" value=csrfToken)    
             button.btn(type="submit") #{editing ? 'Update Product' : 'Add product'}     

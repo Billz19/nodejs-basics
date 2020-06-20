@@ -15,6 +15,8 @@ const { connect } = require('mongoose');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const csrfProtection = require('csurf')();
+const flash = require('connect-flash')
 
 app.set('view engine', 'pug');
 // app.set('view engine','ejs')
@@ -39,6 +41,9 @@ app.use(
     store: store,
   })
 );
+
+app.use(csrfProtection);
+app.use(flash())
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, resp, next) => {
   // User.findByPk('5ee144b589c2f83b37e8e432')
@@ -52,6 +57,12 @@ app.use((req, resp, next) => {
       })
       .catch((err) => console.log(err));
 });
+
+app.use((req,resp,next)=>{
+  resp.locals.isAuthenticated = req.session.loggedIn;
+  resp.locals.csrfToken = req.csrfToken();
+  next();
+})
 app.use('/admin', adminRouter);
 app.use(shopRouter);
 app.use(authRouter);
@@ -100,17 +111,17 @@ connect(MONGODB_URI, {
 })
   .then(() => {
     console.log('Connected');
-    User.findOne().then((user) => {
-      if (!user) {
-        new User({
-          name: 'Bill Lam',
-          email: 'bill@lam.com',
-          cart: {
-            items: [],
-          },
-        }).save();
-      }
-    });
+    // User.findOne().then((user) => {
+    //   if (!user) {
+    //     new User({
+    //       name: 'Bill Lam',
+    //       email: 'bill@lam.com',
+    //       cart: {
+    //         items: [],
+    //       },
+    //     }).save();
+    //   }
+    // });
     app.listen(3030);
   })
   .catch((error) => console.log('Error'));
