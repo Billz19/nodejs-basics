@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const EE = require('../utils/email');
 exports.getLogin = (req, resp) => {
   let message = req.flash('error');
   if (message.length) {
@@ -66,7 +67,7 @@ exports.getSignup = (req, resp) => {
     path: '/signup',
     docTitle: 'SignUp',
     isAuthenticated: false,
-    errorMessage: message
+    errorMessage: message,
   });
 };
 
@@ -90,6 +91,18 @@ exports.postSignup = (req, resp) => {
         })
         .then((result) => {
           resp.redirect('/login');
+          // Load account data
+          EE.Account.Load().then(function (resp) {
+            EE.Email.Send({
+              subject: 'SignUp succeeded',
+              to: email,
+              from: 'lambillo1019@gmail.com',
+              replyTo: '19bill@live.com',
+              body: 'Well Done!',
+              fromName: 'Bill Lam',
+              bodyType: 'Plain',
+            }).catch((err) => console.log('email', err));
+          });
         });
     })
     .catch((error) => console.log(error));
