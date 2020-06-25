@@ -3,6 +3,8 @@ const userSchema = new Schema({
   name: String,
   email: String,
   password: String,
+  resetToken: String,
+  resetTokenExpiration: Date,
   cart: {
     items: [
       {

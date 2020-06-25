@@ -2,3 +2,4 @@ node_modules
 MyLocalConnection Session.sql
 MyLocalConnection.Session.sql
 .vscode
+.env
