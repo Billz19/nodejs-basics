@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const EE = require('../utils/email');
 const crypto = require('crypto');
 const NodemailerTransporter = require('../utils/email');
+const { validationResult } = require('express-validator');
 exports.getLogin = (req, resp) => {
   let message = req.flash('error');
   if (message.length) {
@@ -15,10 +16,29 @@ exports.getLogin = (req, resp) => {
     docTitle: 'Login',
     isAuthenticated: false,
     errorMessage: message,
+    oldInput: {
+      email: '',
+      password: '',
+    },
+    validationErrors: [],
   });
 };
 
 exports.postLogin = (req, resp) => {
+  const { email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return resp.status(422).render('auth/login', {
+      docTitle: 'Login',
+      path: '/login',
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+      },
+      validationErrors: errors.array(),
+    });
+  }
   // resp.setHeader('Set-Cookie', 'loggedIn=true');
   // User.findById('5ee68132c92daa048d3c5dd2')
   //   .then((user) => {
@@ -29,18 +49,33 @@ exports.postLogin = (req, resp) => {
   //     });
   //   })
   //   .catch((err) => console.log(err));
-  const { email, password } = req.body;
   User.findOne({ email }).then((user) => {
     if (!user) {
-      req.flash('error', 'Invalid email !');
-      return resp.redirect('/login');
+      return resp.status(422).render('auth/login', {
+        docTitle: 'Login',
+        path: '/login',
+        errorMessage: 'Invalid email !',
+        oldInput: {
+          email,
+          password,
+        },
+        validationErrors: [],
+      });
     }
     bcrypt
       .compare(password, user.password)
       .then((doMatch) => {
         if (!doMatch) {
-          req.flash('error', 'Wrong password, please try again.');
-          return resp.redirect('/login');
+          return resp.status(422).render('auth/login', {
+            docTitle: 'Login',
+            path: '/login',
+            errorMessage: 'Wrong password, please try again.',
+            oldInput: {
+              email,
+              password,
+            },
+            validationErrors: [],
+          });
         }
         req.session.loggedIn = true;
         req.session.user = user;
@@ -70,48 +105,71 @@ exports.getSignup = (req, resp) => {
     docTitle: 'SignUp',
     isAuthenticated: false,
     errorMessage: message,
+    oldInput: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationErrors: [],
   });
 };
 
 exports.postSignup = (req, resp) => {
+  const errors = validationResult(req);
   const { email, password, confirmPassword } = req.body;
-  User.findOne({ email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash('error', 'E-Mail exists already, please pick another one.');
-        return resp.redirect('/signup');
-      }
-      return bcrypt
-        .hash(password, 12)
-        .then((genPassword) => {
-          const user = new User({
-            email,
-            password: genPassword,
-            cart: { items: [] },
-          });
-          return user.save();
-        })
-        .then((result) => {
-          resp.redirect('/login');
-          NodemailerTransporter.sendMail(
-            {
-              from: process.env.GMAIL_ACCOUNT,
-              to: email,
-              subject: 'SignUp succeeded',
-              text: 'Well done !',
-            },
-            (err, info) => {
-              if (err) {
-                console.log('error mail', err);
-              }
-              if (info) {
-                console.log('info mail', info);
-              }
-            }
-          );
-        });
+  if (!errors.isEmpty()) {
+    return resp.status(422).render('auth/signup', {
+      path: '/signup',
+      docTitle: 'SignUp',
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+        confirmPassword,
+      },
+      validationErrors: errors.array(),
+    });
+  }
+  // return resp.redirect('/');
+  // User.findOne({ email })
+  //   .then((userDoc) => {
+  //     if (userDoc) {
+  //       req.flash('error', 'E-Mail exists already, please pick another one.');
+  //       return resp.redirect('/signup');
+  //     }
+  // return bcrypt
+  bcrypt
+    .hash(password, 12)
+    .then((genPassword) => {
+      const user = new User({
+        email,
+        password: genPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      resp.redirect('/login');
+      NodemailerTransporter.sendMail(
+        {
+          from: process.env.GMAIL_ACCOUNT,
+          to: email,
+          subject: 'SignUp succeeded',
+          text: 'Well done !',
+        },
+        (err, info) => {
+          if (err) {
+            console.log('error mail', err);
+          }
+          if (info) {
+            console.log('info mail', info);
+          }
+        }
+      );
     })
     .catch((error) => console.log(error));
+  // })
+  // .catch((error) => console.log(error));
 };
 
 exports.getReset = (req, resp) => {

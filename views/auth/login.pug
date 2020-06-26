@@ -9,10 +9,10 @@ block content
         form.login-form(method="POST",action= "/login")
             .form-control
                 label(for="email") E-Mail
-                input(type="text" id="email" name="email")
+                input(type="text" id="email" name="email" value=oldInput.email class=validationErrors.find(e => e.param === 'email') ? 'invalid' : '')
             .form-control
                 label(for="password") Password
-                input(type="password" id="password" name="password")
+                input(type="password" id="password" name="password" value=oldInput.password class=validationErrors.find(e => e.param === 'password') ? 'invalid' : '')
             input(type="hidden", name="_csrf" value=csrfToken)    
             button.btn(type="submit") Login 
         .centered
