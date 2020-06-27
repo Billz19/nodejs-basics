@@ -7,10 +7,6 @@ exports.signupValidator = () => {
       .isEmail()
       .withMessage('Please enter a valid email.')
       .custom((value, { req }) => {
-        // if (value === '19bill@live.com') {
-        //   throw new Error('this address is forbidden');
-        // }
-        // return true;
         return User.findOne({ email: value }).then((userDoc) => {
           if (userDoc) {
             return Promise.reject(

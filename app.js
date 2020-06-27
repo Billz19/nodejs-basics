@@ -18,7 +18,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrfProtection = require('csurf')();
-const flash = require('connect-flash')
+const flash = require('connect-flash');
 app.set('view engine', 'pug');
 // app.set('view engine','ejs')
 app.set('views', 'views');
@@ -44,31 +44,39 @@ app.use(
 );
 
 app.use(csrfProtection);
-app.use(flash())
+app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use((req, resp, next) => {
-  // User.findByPk('5ee144b589c2f83b37e8e432')
-  // User.findById('5ee68132c92daa048d3c5dd2')
-  if (!req.session.user) return next()
-    User.findById(req.session.user._id)
-      .then((user) => {
-        req.user = user;
-        // req.user = new User(user.name, user.email, user.cart, user._id);
-        next();
-      })
-      .catch((err) => console.log(err));
-});
 
-app.use((req,resp,next)=>{
+app.use((req, resp, next) => {
   resp.locals.isAuthenticated = req.session.loggedIn;
   resp.locals.csrfToken = req.csrfToken();
   next();
-})
+});
+
+app.use((req, resp, next) => {
+  if (!req.session.user) return next();
+  User.findById(req.session.user._id)
+    .then((user) => {
+      if (!user) return next();
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+       next(new Error(err));
+    });
+});
 app.use('/admin', adminRouter);
 app.use(shopRouter);
 app.use(authRouter);
 
+app.get('/500',errorController.get500)
 app.use(errorController.get404);
+app.use((error,req,resp,next)=>{
+  resp.status(500).render('errors/500', {
+    docTitle: 'Error!',
+    path: '/500',
+  });
+})
 // http.createServer(app).listen(3030);
 
 // sequelize
