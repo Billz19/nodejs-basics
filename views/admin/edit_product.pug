@@ -6,13 +6,15 @@ block content
     main
         if errorMessage
             div.user-message.user-message--error #{errorMessage}
-        form.product-form(method="POST",action= editing ? "/admin/edit_product" :"/admin/add_product")
+        form.product-form(method="POST",action= editing ? "/admin/edit_product" :"/admin/add_product" enctype="multipart/form-data")
             .form-control
                 label(for="title") title
                 input(type="text" id="title" name="title" value= editing || hasError ? product.title :"" class=validationErrors.find(e => e.param === 'title') ? 'invalid' : '')
             .form-control
-                label(for="imageUrl") image
-                input(type="text" id="imageUrl" name="imageUrl" value= editing || hasError ? product.imageUrl :"" class=validationErrors.find(e => e.param === 'imageUrl') ? 'invalid' : '')
+                //- label(for="imageUrl") image
+                //- input(type="text" id="imageUrl" name="imageUrl" value= editing || hasError ? product.imageUrl :"" class=validationErrors.find(e => e.param === 'imageUrl') ? 'invalid' : '')
+                label(for="image") image
+                input(type="file" id="image" name="image")
             .form-control
                 label(for="price") price
                 input(type="number" id="price" name="price" step="any" value= editing || hasError ? product.price :"" class=validationErrors.find(e => e.param === 'price') ? 'invalid' : '')
@@ -22,5 +24,5 @@ block content
             if editing
                 input(type="hidden" value=product._id name="id")    
                 //- input(type="hidden" value=product.id name="id")    
-            input(type="hidden", name="_csrf" value=csrfToken)    
+            input(type="hidden" name="_csrf" value=csrfToken)    
             button.btn(type="submit") #{editing ? 'Update Product' : 'Add product'}     

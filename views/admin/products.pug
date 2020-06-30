@@ -10,7 +10,7 @@ block content
                     header.card__header
                         h1.product__title #{product.title}
                     .card__image
-                        img(src=product.imageUrl || "https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png" , alt=product.title)    
+                        img(src='/'+product.imageUrl , alt=product.title)    
                     .card__content
                         h2.product__price $#{product.price}
                         p.product__description #{product.description}    

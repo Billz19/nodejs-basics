@@ -19,6 +19,23 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrfProtection = require('csurf')();
 const flash = require('connect-flash');
+const multer = require('multer');
+const storageOptions = multer.diskStorage({
+  destination(req,file,callback){
+    callback(null,'images/')
+  },
+  filename(req,file,callback){
+    callback(null, file.originalname);
+  }
+});
+const fileFilter = (req,file,callback)=>{
+ const regex = new RegExp(/image\/(png|jpg|jpeg)/);
+  if (regex.test(file.mimetype)) {
+    callback(null, true);
+  } else {
+    callback(null, false);
+  }
+}
 app.set('view engine', 'pug');
 // app.set('view engine','ejs')
 app.set('views', 'views');
@@ -33,6 +50,10 @@ app.use(
     extended: false,
   })
 );
+
+app.use(
+  multer({storage: storageOptions,fileFilter}).single('image')
+);
 app.use(cookieParser());
 app.use(
   session({
@@ -46,6 +67,7 @@ app.use(
 app.use(csrfProtection);
 app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images',express.static(path.join(__dirname, 'images')));
 
 app.use((req, resp, next) => {
   resp.locals.isAuthenticated = req.session.loggedIn;

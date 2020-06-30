@@ -20,6 +20,8 @@ router.post(
 
 router.get('/orders', isAuth, shopController.getOrders);
 
+router.get('/orders/:orderId', isAuth, shopController.getInvoices);
+
 router.post('/add_order', isAuth, shopController.postOrder);
 
 module.exports = router;

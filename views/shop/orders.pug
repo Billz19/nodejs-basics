@@ -8,7 +8,8 @@ block content
                 each order in orders
                     li.orders__item
                         //- h1 # #{order.id}
-                        h1 # #{order._id}
+                        h1 # #{order._id} - 
+                            a(href="/orders/"+order._id) invoice
                         ul.orders__products
                             //- each prod in order.products
                             //- each prod in order.items

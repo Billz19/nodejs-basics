@@ -1,6 +1,8 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
-
+const path = require('path');
+const { createWriteStream, createReadStream } = require('fs');
+const PDFDocument = require('pdfkit');
 exports.getProducts = (req, resp, next) => {
   Product.find()
     .then((products) => {
@@ -148,4 +150,53 @@ exports.postOrder = (req, resp, next) => {
       error.httpStatusCode = 500;
       return next(error);
     });
+};
+
+exports.getInvoices = (req, resp, next) => {
+  const orderId = req.params.orderId;
+  const fileName = 'invoice-' + orderId + '.pdf';
+  const invoicePath = path.join('uploads', 'invoices', fileName);
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return next(new Error('No order found!'));
+      }
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error('Unauthorized!'));
+      }
+      const pdfDoc = new PDFDocument();
+      resp.setHeader('Content-Type', 'application/pdf');
+      resp.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+      pdfDoc.pipe(createWriteStream(invoicePath));
+      pdfDoc.pipe(resp);
+
+      pdfDoc.fontSize(24).text('Invoice',{
+        align: 'center'
+      });
+      pdfDoc.text('--------------------')
+      let total = 0;
+      order.products.forEach(p => {
+        total += p.quantity * p.product.price;
+        pdfDoc
+          .fontSize(14)
+          .text(`${p.product.title}-> (${p.quantity}) x $${p.product.price}`);
+      });
+      pdfDoc.text('--------------------');
+      pdfDoc.text('Total: $' + total);
+
+      pdfDoc.end();
+      // readFile(invoicePath, (error, file) => {
+      //   if (error) {
+      //     return next(error);
+      //   }
+      //   resp.setHeader('Content-Type', 'application/pdf');
+      //   resp.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+      //   resp.send(file);
+      // });
+      // const fileStream = createReadStream(invoicePath);
+      // resp.setHeader('Content-Type', 'application/pdf');
+      // resp.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+      // fileStream.pipe(resp);
+    })
+    .catch((err) => next(err));
 };
