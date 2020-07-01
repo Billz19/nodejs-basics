@@ -1,23 +1,39 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
 const path = require('path');
-const { createWriteStream, createReadStream } = require('fs');
+const { createWriteStream } = require('fs');
 const PDFDocument = require('pdfkit');
+const ITEM_PER_PAGE = 1;
 exports.getProducts = (req, resp, next) => {
-  Product.find()
-    .then((products) => {
-      resp.render('shop/product_list', {
-        prods: products,
-        docTitle: 'All Products',
-        path: '/prods',
-        isAuthenticated: req.session.loggedIn,
+    const page = +req.query.page || 1;
+    let numberItems;
+    Product.find()
+      .countDocuments()
+      .then((nbrDocs) => {
+        numberItems = nbrDocs;
+        return Product.find()
+          .skip((page - 1) * ITEM_PER_PAGE)
+          .limit(ITEM_PER_PAGE);
+      })
+      .then((products) => {
+        resp.render('shop/product_list', {
+          prods: products,
+          docTitle: 'All Products',
+          path: '/prods',
+          currentPage: page,
+          hasNextPage: page * ITEM_PER_PAGE < numberItems,
+          hasPrevPage: page > 1,
+          nextPageNum: page + 1,
+          prevPageNum: page - 1,
+          lastPage: Math.ceil(numberItems / ITEM_PER_PAGE),
+          firstPage: 1,
+        });
+      })
+      .catch((err) => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
       });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
 };
 
 exports.getProduct = (req, resp, next) => {
@@ -27,7 +43,6 @@ exports.getProduct = (req, resp, next) => {
         product,
         docTitle: 'Product - ' + product.title,
         path: '/prods',
-        isAuthenticated: req.session.loggedIn,
       });
     })
     .catch((err) => {
@@ -38,17 +53,33 @@ exports.getProduct = (req, resp, next) => {
 };
 
 exports.getIndex = (req, resp, next) => {
+  const page = +req.query.page || 1;
+  let numberItems;
   Product.find()
+    .countDocuments()
+    .then((nbrDocs) => {
+      numberItems = nbrDocs;
+      return Product.find()
+        .skip((page - 1) * ITEM_PER_PAGE)
+        .limit(ITEM_PER_PAGE);
+    })
     .then((products) => {
       resp.render('shop/index', {
         prods: products,
         docTitle: 'Shop',
         path: '/shop',
-        isAuthenticated: req.session.loggedIn,
         csrfToken: req.csrfToken(),
+        currentPage: page,
+        hasNextPage: page * ITEM_PER_PAGE < numberItems,
+        hasPrevPage: page > 1,
+        nextPageNum: page + 1,
+        prevPageNum: page - 1,
+        lastPage: Math.ceil(numberItems / ITEM_PER_PAGE),
+        firstPage: 1
       });
     })
     .catch((err) => {
+      console.log(err);
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
@@ -68,7 +99,6 @@ exports.getCart = (req, resp, next) => {
         docTitle: 'Your Cart',
         path: '/cart',
         productsInCart: products,
-        isAuthenticated: req.session.loggedIn,
       });
     })
     .catch((err) => {
@@ -113,7 +143,6 @@ exports.getOrders = (req, resp, next) => {
         docTitle: 'Your Orders',
         path: '/orders',
         orders,
-        isAuthenticated: req.session.loggedIn,
       });
     })
     .catch((err) => {
@@ -170,12 +199,12 @@ exports.getInvoices = (req, resp, next) => {
       pdfDoc.pipe(createWriteStream(invoicePath));
       pdfDoc.pipe(resp);
 
-      pdfDoc.fontSize(24).text('Invoice',{
-        align: 'center'
+      pdfDoc.fontSize(24).text('Invoice', {
+        align: 'center',
       });
-      pdfDoc.text('--------------------')
+      pdfDoc.text('--------------------');
       let total = 0;
-      order.products.forEach(p => {
+      order.products.forEach((p) => {
         total += p.quantity * p.product.price;
         pdfDoc
           .fontSize(14)

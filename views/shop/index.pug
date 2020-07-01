@@ -19,6 +19,9 @@ block content
                         if isAuthenticated    
                             +addToCartForm(product._id)    
                         //- a.btn(href="/products/"+product.id) Details    
-                        //- +addToCartForm(product.id)    
+                        //- +addToCartForm(product.id)
+            +addPagination(firstPage,currentPage,hasNextPage,nextPageNum,hasPrevPage,prevPageNum,lastPage)
+
+
     else
         h1 No product yet

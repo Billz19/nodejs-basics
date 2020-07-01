@@ -1,0 +1,11 @@
+mixin addPagination(fp,cp,hnp,np,hpp,pp,lp)
+    .pagination
+        if fp !== cp   
+            a(href="?page="+fp) #{fp}
+        if hpp && pp !== 1
+            a(href="?page="+ pp) #{pp}
+        a.active(href="?page="+cp) #{cp}
+        if hnp
+            a(href="?page="+np) #{np}
+        if lp !== cp && lp !== np                       
+            a(href="?page="+lp) #{lp}
