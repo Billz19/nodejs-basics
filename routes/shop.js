@@ -18,10 +18,16 @@ router.post(
   shopController.postProductCartDelete
 );
 
+router.get('/checkout',isAuth,shopController.getCheckout)
+
+router.get('/checkout/success',isAuth,shopController.postOrder)
+
+router.get('/checkout/cancel',isAuth,shopController.getCheckout)
+
 router.get('/orders', isAuth, shopController.getOrders);
 
 router.get('/orders/:orderId', isAuth, shopController.getInvoices);
 
-router.post('/add_order', isAuth, shopController.postOrder);
+// router.post('/add_order', isAuth, shopController.postOrder);
 
 module.exports = router;

@@ -1,2 +1,23 @@
 extends ../layout/main-layout.pug
+block styles
+    link(rel="stylesheet", href="/css/cart.css")
 block content
+    main
+        ul.cart__item-list
+            each prod in productsInCart
+                li.cart__item 
+                    h1 #{prod.title}
+                    h2 Quantity: #{prod.quantity}
+        hr
+        .centered
+            h1  Total: #{totalSum}               
+            button.btn(id="btn-id") Order
+        script(src="https://js.stripe.com/v3/")
+        script.
+            var stripe = Stripe('#{apiKey}')
+            var btnOrder = document.getElementById('btn-id');
+            btnOrder.addEventListener('click',function(){
+                stripe.redirectToCheckout({
+                    sessionId: '#{sessionId}'
+                })
+            });

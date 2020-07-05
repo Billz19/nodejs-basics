@@ -20,6 +20,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrfProtection = require('csurf')();
 const flash = require('connect-flash');
 const multer = require('multer');
+const { log } = require('console');
 const storageOptions = multer.diskStorage({
   destination(req,file,callback){
     callback(null,'images/')
@@ -94,6 +95,7 @@ app.use(authRouter);
 app.get('/500',errorController.get500)
 app.use(errorController.get404);
 app.use((error,req,resp,next)=>{
+      console.log(error);
   resp.status(500).render('errors/500', {
     docTitle: 'Error!',
     path: '/500',
