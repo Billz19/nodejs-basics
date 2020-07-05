@@ -13,6 +13,8 @@ router.get('/edit_product/:productId', isAuth, adminController.getEditProduct);
 
 router.post('/edit_product',productValidator() ,isAuth, adminController.postEditProduct);
 
-router.post('/delete_product', isAuth, adminController.postDeleteProduct);
+// router.post('/delete_product', isAuth, adminController.postDeleteProduct);
+
+router.delete('/product/:id', isAuth, adminController.deleteProduct);
 
 module.exports = router;

@@ -17,10 +17,14 @@ block content
                     .card__actions
                         a.btn.edit-product(href="/admin/edit_product/"+product._id) Edit 
                         //- a.btn.edit-product(href="/admin/edit_product/"+product.id) Edit 
-                        form(action="/admin/delete_product" method="post")
-                            input(type="hidden" name="id", value=product._id)   
+                        //- form(action="/admin/delete_product" method="post")
+                        input(type="hidden" name="id", value=product._id)   
                             //- input(type="hidden" name="id", value=product.id) 
-                            input(type="hidden", name="_csrf" value=csrfToken)  
-                            button.btn(type="submit") Delete    
+                        input(type="hidden", name="_csrf" value=csrfToken)  
+                        //- button.btn(type="submit") Delete    
+                        button.btn(type="button" onclick="deleteProduct(this)") Delete    
     else
         h1 No product yet
+    
+
+    script(src="/js/admin.js")
