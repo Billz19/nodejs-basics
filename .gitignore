@@ -5,3 +5,4 @@ MyLocalConnection.Session.sql
 .env
 server.key
 server.cert
+package-lock.json
