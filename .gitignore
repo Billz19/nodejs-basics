@@ -3,3 +3,5 @@ MyLocalConnection Session.sql
 MyLocalConnection.Session.sql
 .vscode
 .env
+server.key
+server.cert

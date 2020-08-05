@@ -1,0 +1,3 @@
+::1 - - [05/Aug/2020:18:52:44 +0000] "GET /https://picsum.photos/200/300 HTTP/1.1" 404 1017 "https://localhost:3030/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36"
+::1 - - [05/Aug/2020:18:52:44 +0000] "GET /favicon.ico HTTP/1.1" 404 1017 "https://localhost:3030/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36"
+::1 - - [05/Aug/2020:18:53:01 +0000] "GET /https://picsum.photos/200/300 HTTP/1.1" 404 1017 "https://localhost:3030/products" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36"

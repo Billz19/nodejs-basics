@@ -1,10 +1,12 @@
 // const http = require('http');
 const dotenv = require('dotenv');
 dotenv.config();
+const https = require('https');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const MONGODB_URI = 'mongodb://localhost:27017/shop';
+// const MONGODB_URI = 'mongodb://localhost:27017/shop';
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0-fedsh.gcp.mongodb.net/${process.env.MONGO_DEFAULT_DB}?retryWrites=true&w=majority`;
 // const { mongoConnect } = require('./utils/database');
 const app = express();
 const errorController = require('./controllers/error');
@@ -20,7 +22,10 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrfProtection = require('csurf')();
 const flash = require('connect-flash');
 const multer = require('multer');
-const { log } = require('console');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+const { createWriteStream, readFileSync } = require('fs');
 const storageOptions = multer.diskStorage({
   destination(req,file,callback){
     callback(null,'images/')
@@ -45,6 +50,11 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions',
 });
+
+// const privateKey = readFileSync('server.key');
+// const certificate = readFileSync('server.cert');
+
+const logStream = createWriteStream(path.join(__dirname,'access.log'),{flags:'a'})
 
 app.use(
   bodyParser.urlencoded({
@@ -91,6 +101,12 @@ app.use((req, resp, next) => {
 app.use('/admin', adminRouter);
 app.use(shopRouter);
 app.use(authRouter);
+
+app.use(helmet());
+
+app.use(compression())
+
+app.use(morgan('combined',{stream: logStream}))
 
 app.get('/500',errorController.get500)
 app.use(errorController.get404);
@@ -143,7 +159,7 @@ connect(MONGODB_URI, {
   useUnifiedTopology: true,
 })
   .then(() => {
-    console.log('Connected');
+    // console.log('Connected');
     // User.findOne().then((user) => {
     //   if (!user) {
     //     new User({
@@ -155,6 +171,8 @@ connect(MONGODB_URI, {
     //     }).save();
     //   }
     // });
+
+    // https.createServer({key: privateKey,cert: certificate},app).listen(3030);
     app.listen(3030);
   })
   .catch((error) => console.log('Error'));
